@@ -1,0 +1,11 @@
+{
+  "name": "skillshare-functions",
+  "description": "Cloud Functions for SkillShare 2.0 (secure session confirmation and XP rewards)",
+  "private": true,
+  "main": "index.js",
+  "engines": { "node": "20" },
+  "dependencies": {
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.1"
+  }
+}

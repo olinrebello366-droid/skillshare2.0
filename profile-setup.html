@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your profile · SkillShare 2.0</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <header id="siteNav" class="site-nav"></header>
+  <main class="container page narrow">
+    <h1 id="pageTitle">Set up your profile</h1>
+    <p class="muted">Tell people who you are and which skills you can teach or want to learn.</p>
+    <form id="profileForm" class="card form-card" novalidate>
+      <label>Full name
+        <input class="input" type="text" name="name" maxlength="60" required>
+      </label>
+      <label>Short bio <span class="muted small">(optional, up to 300 characters)</span>
+        <textarea class="input" name="bio" rows="3" maxlength="300" placeholder="For example: Final-year student who loves teaching Python."></textarea>
+      </label>
+
+      <div class="field">
+        <span class="label">Skills I can teach</span>
+        <p class="muted small">The level you choose is your own estimate (self-declared). Your real level grows as you complete sessions.</p>
+        <div id="teachPicker"></div>
+      </div>
+
+      <div class="field">
+        <span class="label">Skills I want to learn</span>
+        <div id="learnPicker"></div>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Save profile</button>
+    </form>
+  </main>
+  <script type="module" src="js/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,1099 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SkillShare 2.0 | Learn. Teach. Grow.</title>
+
+<meta name="description" content="Learn new skills, teach what you know, connect with people and grow through SkillShare 2.0.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #6c4df6;
+  --primary-dark: #5638df;
+  --purple-light: #f2efff;
+  --dark: #17152b;
+  --text: #66647a;
+  --white: #ffffff;
+  --border: #eceaf3;
+  --green: #21a67a;
+  --shadow: 0 20px 60px rgba(37, 25, 90, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #ffffff;
+  color: var(--dark);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font: inherit;
+}
+
+.container {
+  width: min(1160px, 90%);
+  margin: auto;
+}
+
+/* NAVIGATION */
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(230,228,240,0.8);
+}
+
+.nav-inner {
+  min-height: 78px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  font-family: 'Manrope', sans-serif;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.brand span {
+  color: var(--primary);
+}
+
+.brand small {
+  font-size: 12px;
+  color: var(--primary);
+  background: var(--purple-light);
+  padding: 4px 7px;
+  border-radius: 6px;
+  margin-left: 3px;
+  letter-spacing: 0;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-links > a:not(.btn) {
+  font-size: 14px;
+  color: #66647a;
+  font-weight: 600;
+  margin-right: 18px;
+}
+
+.nav-links > a:not(.btn):hover {
+  color: var(--primary);
+}
+
+/* BUTTONS */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 22px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 0.25s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 7px 20px rgba(108,77,246,0.20);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(108,77,246,0.25);
+}
+
+.btn-ghost {
+  border-color: var(--border);
+  background: white;
+  color: var(--dark);
+}
+
+.btn-ghost:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* HERO */
+
+.hero {
+  padding: 105px 0 90px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: 65px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border-radius: 30px;
+  background: var(--purple-light);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  margin-bottom: 24px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+}
+
+.hero h1 {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(43px, 5.3vw, 70px);
+  line-height: 1.08;
+  letter-spacing: -3px;
+  font-weight: 800;
+  max-width: 650px;
+}
+
+.hero h1 span {
+  color: var(--primary);
+}
+
+.hero .lead {
+  font-size: 17px;
+  color: var(--text);
+  max-width: 510px;
+  margin: 25px 0 30px;
+  line-height: 1.8;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hero-note {
+  color: #9996a9;
+  font-size: 12px;
+  margin-top: 18px;
+}
+
+/* HERO VISUAL */
+
+.hero-visual {
+  background: linear-gradient(145deg, #f5f2ff, #ebe6ff);
+  padding: 28px;
+  border-radius: 30px;
+  position: relative;
+  min-height: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-preview {
+  background: white;
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 22px;
+  width: 100%;
+  padding: 25px;
+  box-shadow: 0 25px 70px rgba(60,40,130,0.13);
+  transform: rotate(-2deg);
+}
+
+.preview-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.preview-title {
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d7caff, #8e72f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+}
+
+.welcome-card {
+  background: linear-gradient(110deg, #6c4df6, #9477ff);
+  color: white;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 22px;
+}
+
+.welcome-card p {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.welcome-card h3 {
+  font-size: 23px;
+  margin: 5px 0;
+}
+
+.preview-section-title {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 15px;
+}
+
+.skill-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+.skill-icon {
+  width: 42px;
+  height: 42px;
+  background: #f1edff;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 19px;
+}
+
+.skill-info {
+  flex: 1;
+}
+
+.skill-info strong {
+  display: block;
+  font-size: 12px;
+}
+
+.skill-info small {
+  font-size: 10px;
+  color: #9996a9;
+}
+
+.progress {
+  height: 6px;
+  background: #eeeaf7;
+  border-radius: 10px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  border-radius: 10px;
+}
+
+.level-tag {
+  background: #f2efff;
+  color: var(--primary);
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* TRUST STRIP */
+
+.trust-strip {
+  padding: 25px 0;
+  background: #faf9fd;
+  border-top: 1px solid #f1eff7;
+  border-bottom: 1px solid #f1eff7;
+}
+
+.trust-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 55px;
+  flex-wrap: wrap;
+  color: #777489;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+/* GENERAL SECTIONS */
+
+section.content-section {
+  padding: 100px 0;
+}
+
+.section-heading {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 55px;
+}
+
+.section-heading .eyebrow {
+  margin-bottom: 15px;
+}
+
+.section-heading h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1.2;
+  letter-spacing: -1.5px;
+  margin-bottom: 15px;
+}
+
+.section-heading p {
+  color: var(--text);
+  font-size: 15px;
+}
+
+/* HOW IT WORKS */
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.step-card {
+  padding: 30px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition: 0.3s;
+  background: white;
+}
+
+.step-card:hover {
+  transform: translateY(-7px);
+  box-shadow: var(--shadow);
+  border-color: #d9d0ff;
+}
+
+.step-number {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: var(--purple-light);
+  color: var(--primary);
+  border-radius: 14px;
+  font-weight: 800;
+  margin-bottom: 23px;
+}
+
+.step-card h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.step-card p {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* LEVELS */
+
+.levels-section {
+  background: #faf9fd;
+}
+
+.levels-layout {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 65px;
+  align-items: center;
+}
+
+.levels-copy h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 42px;
+  letter-spacing: -1.5px;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.levels-copy p {
+  color: var(--text);
+  margin-bottom: 25px;
+  line-height: 1.8;
+}
+
+.levels-list {
+  background: white;
+  padding: 30px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.level-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 0;
+  border-bottom: 1px solid #f0eef5;
+}
+
+.level-item:last-child {
+  border-bottom: none;
+}
+
+.level-number {
+  width: 38px;
+  height: 38px;
+  background: var(--purple-light);
+  color: var(--primary);
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+
+.level-details {
+  flex: 1;
+}
+
+.level-details strong {
+  font-size: 14px;
+}
+
+.level-details small {
+  display: block;
+  color: #9996a9;
+  font-size: 12px;
+}
+
+.level-status {
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* FEATURES */
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.feature-card {
+  padding: 27px;
+  background: #faf9fd;
+  border: 1px solid #f0eef6;
+  border-radius: 18px;
+}
+
+.feature-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  font-size: 21px;
+  margin-bottom: 20px;
+}
+
+.feature-card h3 {
+  font-size: 16px;
+  margin-bottom: 9px;
+}
+
+.feature-card p {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+/* CTA */
+
+.cta-section {
+  padding: 30px 0 100px;
+}
+
+.cta-box {
+  background: linear-gradient(120deg, #5e40e9, #8d70ff);
+  color: white;
+  padding: 65px 30px;
+  border-radius: 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-box h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(30px, 4vw, 44px);
+  letter-spacing: -1.5px;
+  margin-bottom: 15px;
+}
+
+.cta-box p {
+  color: rgba(255,255,255,0.8);
+  max-width: 500px;
+  margin: 0 auto 28px;
+  font-size: 15px;
+}
+
+.cta-box .btn {
+  background: white;
+  color: var(--primary);
+}
+
+.cta-box .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* FOOTER */
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 35px 0;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-brand {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.footer-brand span {
+  color: var(--primary);
+}
+
+.footer-note {
+  color: #9996a9;
+  font-size: 12px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 850px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 75px 0;
+    gap: 45px;
+  }
+
+  .hero-visual {
+    min-height: 390px;
+  }
+
+  .levels-layout {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .steps-grid,
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 91%;
+  }
+
+  .nav-inner {
+    min-height: 68px;
+  }
+
+  .brand {
+    font-size: 19px;
+  }
+
+  .nav-links {
+    gap: 7px;
+  }
+
+  .nav-links .btn {
+    padding: 9px 11px;
+    font-size: 12px;
+  }
+
+  .nav-links > a:not(.btn) {
+    display: none;
+  }
+
+  .hero {
+    padding: 65px 0;
+  }
+
+  .hero h1 {
+    font-size: 44px;
+    letter-spacing: -2px;
+  }
+
+  .hero .lead {
+    font-size: 15px;
+  }
+
+  .hero-visual {
+    padding: 15px;
+    min-height: 340px;
+    border-radius: 22px;
+  }
+
+  .dashboard-preview {
+    padding: 18px;
+  }
+
+  .trust-inner {
+    gap: 18px;
+  }
+
+  section.content-section {
+    padding: 70px 0;
+  }
+
+  .steps-grid,
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .levels-copy h2 {
+    font-size: 34px;
+  }
+
+  .cta-box {
+    padding: 50px 20px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="site-nav">
+  <div class="container nav-inner">
+
+    <a href="index.html" class="brand">
+      Skill<span>Share</span><small>2.0</small>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#levels">Skill levels</a>
+      <a href="#features">Features</a>
+
+      <span data-guest>
+        <a href="login.html" class="btn btn-ghost">Log in</a>
+        <a href="register.html" class="btn btn-primary">Get started</a>
+      </span>
+
+      <a data-member hidden href="dashboard.html" class="btn btn-primary">
+        Dashboard
+      </a>
+    </nav>
+
+  </div>
+</header>
+
+<main>
+
+<!-- HERO -->
+
+<section class="hero container">
+
+  <div class="hero-content">
+
+    <div class="eyebrow">
+      <span class="dot"></span>
+      YOUR SKILLS. YOUR GROWTH.
+    </div>
+
+    <h1>
+      Learn something new.<br>
+      <span>Teach something valuable.</span>
+    </h1>
+
+    <p class="lead">
+      A community where people exchange knowledge, discover new abilities,
+      and grow together. Share what you know, learn what you don't,
+      and level up every skill.
+    </p>
+
+    <div class="hero-actions">
+      <span data-guest>
+        <a href="register.html" class="btn btn-primary">
+          Start learning free →
+        </a>
+        <a href="#how-it-works" class="btn btn-ghost">
+          Explore how it works
+        </a>
+      </span>
+
+      <a data-member hidden href="dashboard.html" class="btn btn-primary">
+        Go to dashboard →
+      </a>
+    </div>
+
+    <p class="hero-note">
+      Learn at your own pace · Teach your strengths · Grow together
+    </p>
+
+  </div>
+
+  <!-- Decorative dashboard preview -->
+
+  <div class="hero-visual">
+
+    <div class="dashboard-preview">
+
+      <div class="preview-top">
+        <div>
+          <p style="font-size:11px;color:#9996a9;">YOUR LEARNING SPACE</p>
+          <div class="preview-title">My Skills</div>
+        </div>
+        <div class="avatar">S</div>
+      </div>
+
+      <div class="welcome-card">
+        <p>KEEP GROWING</p>
+        <h3>Every skill has a journey.</h3>
+        <p>Small steps. Real progress.</p>
+      </div>
+
+      <div class="preview-section-title">Your skill progress</div>
+
+      <div class="skill-row">
+        <div class="skill-icon">⌨️</div>
+        <div class="skill-info">
+          <strong>Python</strong>
+          <small>Learning progress</small>
+          <div class="progress"><span style="width:75%"></span></div>
+        </div>
+        <div class="level-tag">Level 4</div>
+      </div>
+
+      <div class="skill-row">
+        <div class="skill-icon">🎨</div>
+        <div class="skill-info">
+          <strong>Graphic Design</strong>
+          <small>Learning progress</small>
+          <div class="progress"><span style="width:45%"></span></div>
+        </div>
+        <div class="level-tag">Level 2</div>
+      </div>
+
+      <div class="skill-row">
+        <div class="skill-icon">💻</div>
+        <div class="skill-info">
+          <strong>Web Development</strong>
+          <small>Learning progress</small>
+          <div class="progress"><span style="width:30%"></span></div>
+        </div>
+        <div class="level-tag">Level 2</div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- TRUST STRIP -->
+
+<div class="trust-strip">
+  <div class="container trust-inner">
+    <div class="trust-item">✦ Learn from people</div>
+    <div class="trust-item">✦ Share your knowledge</div>
+    <div class="trust-item">✦ Build real connections</div>
+    <div class="trust-item">✦ Grow skill by skill</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+
+<section class="content-section container" id="how-it-works">
+
+  <div class="section-heading">
+    <div class="eyebrow">SIMPLE BY DESIGN</div>
+    <h2>Learning should be a two-way street.</h2>
+    <p>
+      You don't need to know everything. You just need something
+      to share and something you want to learn.
+    </p>
+  </div>
+
+  <div class="steps-grid">
+
+    <article class="step-card">
+      <div class="step-number">01</div>
+      <h3>Create your profile</h3>
+      <p>
+        Tell the community what you can teach and what skills
+        you are interested in learning.
+      </p>
+    </article>
+
+    <article class="step-card">
+      <div class="step-number">02</div>
+      <h3>Find your learning partner</h3>
+      <p>
+        Explore people, discover matching skills, send a connection
+        request, and arrange a learning session.
+      </p>
+    </article>
+
+    <article class="step-card">
+      <div class="step-number">03</div>
+      <h3>Learn, teach and level up</h3>
+      <p>
+        Complete sessions, confirm your progress, earn XP,
+        and improve the level of each individual skill.
+      </p>
+    </article>
+
+  </div>
+
+</section>
+
+<!-- LEVEL SYSTEM -->
+
+<section class="content-section levels-section" id="levels">
+
+  <div class="container levels-layout">
+
+    <div class="levels-copy">
+      <div class="eyebrow">YOUR JOURNEY, YOUR PROGRESS</div>
+
+      <h2>Every skill has its own level.</h2>
+
+      <p>
+        Your abilities are not all the same, so your progress
+        shouldn't be either. SkillShare tracks each skill separately.
+      </p>
+
+      <p>
+        You might be an expert in Python and a beginner in
+        Graphic Design. Keep learning, teaching, and improving
+        one skill at a time.
+      </p>
+
+      <a href="register.html" class="btn btn-primary">
+        Start your journey →
+      </a>
+    </div>
+
+    <div class="levels-list">
+
+      <div class="level-item">
+        <div class="level-number">1</div>
+        <div class="level-details">
+          <strong>Beginner</strong>
+          <small>Starting your journey</small>
+        </div>
+        <span class="level-status">Start</span>
+      </div>
+
+      <div class="level-item">
+        <div class="level-number">2</div>
+        <div class="level-details">
+          <strong>Explorer</strong>
+          <small>Building your foundation</small>
+        </div>
+      </div>
+
+      <div class="level-item">
+        <div class="level-number">3</div>
+        <div class="level-details">
+          <strong>Skilled</strong>
+          <small>Growing your abilities</small>
+        </div>
+      </div>
+
+      <div class="level-item">
+        <div class="level-number">4</div>
+        <div class="level-details">
+          <strong>Expert</strong>
+          <small>Sharing advanced knowledge</small>
+        </div>
+      </div>
+
+      <div class="level-item">
+        <div class="level-number">5</div>
+        <div class="level-details">
+          <strong>Master</strong>
+          <small>Demonstrating strong expertise</small>
+        </div>
+        <span class="level-status">Goal</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- FEATURES -->
+
+<section class="content-section container" id="features">
+
+  <div class="section-heading">
+    <div class="eyebrow">BUILT FOR GROWTH</div>
+    <h2>More than just a learning platform.</h2>
+    <p>
+      Everything you need to connect with people and
+      make your learning journey meaningful.
+    </p>
+  </div>
+
+  <div class="features-grid">
+
+    <article class="feature-card">
+      <div class="feature-icon">🔎</div>
+      <h3>Discover skills</h3>
+      <p>Find people who can teach the skills you want to learn.</p>
+    </article>
+
+    <article class="feature-card">
+      <div class="feature-icon">🤝</div>
+      <h3>Real connections</h3>
+      <p>Connect with learners and teachers through requests and chat.</p>
+    </article>
+
+    <article class="feature-card">
+      <div class="feature-icon">⭐</div>
+      <h3>Earn XP</h3>
+      <p>Get rewarded for verified learning and teaching sessions.</p>
+    </article>
+
+    <article class="feature-card">
+      <div class="feature-icon">📈</div>
+      <h3>Track progress</h3>
+      <p>Watch your individual skill levels grow over time.</p>
+    </article>
+
+    <article class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <h3>Unlock achievements</h3>
+      <p>Celebrate milestones and build your learning reputation.</p>
+    </article>
+
+    <article class="feature-card">
+      <div class="feature-icon">🌱</div>
+      <h3>Grow together</h3>
+      <p>Teach what you know while discovering what others can share.</p>
+    </article>
+
+  </div>
+
+</section>
+
+<!-- CTA -->
+
+<section class="cta-section container">
+
+  <div class="cta-box">
+    <h2>Your next skill starts here.</h2>
+    <p>
+      Join a community where everyone has something to teach
+      and something new to learn.
+    </p>
+
+    <a href="register.html" class="btn">
+      Create your free account →
+    </a>
+  </div>
+
+</section>
+
+</main>
+
+<!-- FOOTER -->
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+
+    <div class="footer-brand">
+      Skill<span>Share</span> 2.0
+    </div>
+
+    <div class="footer-note">
+      Learn. Teach. Earn. Level Up.
+    </div>
+
+    <div class="footer-note">
+      © 2026 SkillShare 2.0
+    </div>
+
+  </div>
+</footer>
+
+<script type="module" src="js/landing.js"></script>
+
+</body>
+</html>

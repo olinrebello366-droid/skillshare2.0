@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore · SkillShare 2.0</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <header id="siteNav" class="site-nav"></header>
+  <main class="container page">
+    <h1>Find people to learn from</h1>
+    <div class="toolbar">
+      <input class="input" id="searchInput" type="search" placeholder="Search by name or skill..." aria-label="Search people">
+      <select class="input" id="skillFilter" aria-label="Filter by skill they teach"></select>
+    </div>
+    <div class="grid" id="results"><p class="muted">Loading...</p></div>
+  </main>
+
+  <dialog id="profileDialog" class="dialog">
+    <div id="profileBody"></div>
+    <div class="dialog-actions"><button class="btn btn-ghost" id="closeProfile" type="button">Close</button></div>
+  </dialog>
+  <script type="module" src="js/explore.js"></script>
+</body>
+</html>

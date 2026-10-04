@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign up · SkillShare 2.0</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-body">
+  <main class="auth-card card">
+    <a class="brand" href="index.html">Skill<span>Share</span> 2.0</a>
+    <h1>Create your account</h1>
+    <p class="muted">It takes a minute. Next you will choose your skills.</p>
+    <form id="registerForm" novalidate>
+      <label>Full name
+        <input class="input" type="text" name="fullName" autocomplete="name" required>
+      </label>
+      <label>Email
+        <input class="input" type="email" name="email" autocomplete="email" required>
+      </label>
+      <label>Password <span class="muted small">(at least 8 characters)</span>
+        <input class="input" type="password" name="password" autocomplete="new-password" required>
+      </label>
+      <label>Confirm password
+        <input class="input" type="password" name="confirmPassword" autocomplete="new-password" required>
+      </label>
+      <p class="form-error" id="formError" role="alert" hidden></p>
+      <button class="btn btn-primary btn-block" type="submit">Create account</button>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
+  </main>
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>

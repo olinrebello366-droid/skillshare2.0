@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connections · SkillShare 2.0</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <header id="siteNav" class="site-nav"></header>
+  <main class="container page narrow">
+    <h1>Connections</h1>
+    <section class="card">
+      <h2>Requests for you <span class="count" id="incomingCount">0</span></h2>
+      <div id="incoming"><p class="muted">Loading...</p></div>
+    </section>
+    <section class="card">
+      <h2>Your connections <span class="count" id="connectedCount">0</span></h2>
+      <div id="connected"><p class="muted">Loading...</p></div>
+    </section>
+    <section class="card">
+      <h2>Requests you sent <span class="count" id="sentCount">0</span></h2>
+      <div id="sent"><p class="muted">Loading...</p></div>
+    </section>
+  </main>
+  <script type="module" src="js/connections.js"></script>
+</body>
+</html>

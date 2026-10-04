@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sessions · SkillShare 2.0</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <header id="siteNav" class="site-nav"></header>
+  <main class="container page">
+    <h1>Sessions</h1>
+
+    <section class="card">
+      <h2>Schedule a session</h2>
+      <p class="muted small" id="noConnections" hidden>You need an accepted connection first. <a href="explore.html">Find people</a>.</p>
+      <form id="sessionForm" class="form-grid">
+        <label>With
+          <select class="input" id="withSelect" required></select>
+        </label>
+        <label>My role
+          <select class="input" id="roleSelect">
+            <option value="learn">I will learn</option>
+            <option value="teach">I will teach</option>
+          </select>
+        </label>
+        <label>Skill
+          <select class="input" id="skillSelect" required></select>
+        </label>
+        <label>Date
+          <input class="input" type="date" id="dateInput" required>
+        </label>
+        <label>Time
+          <input class="input" type="time" id="timeInput" required>
+        </label>
+        <label>Length
+          <select class="input" id="durationSelect">
+            <option value="30">30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60" selected>1 hour</option>
+            <option value="90">90 minutes</option>
+          </select>
+        </label>
+        <p class="muted small full" id="skillHint"></p>
+        <div class="full"><button class="btn btn-primary" id="createBtn" type="submit" disabled>Schedule session</button></div>
+      </form>
+    </section>
+
+    <section class="card info-card">
+      <h2>How XP works</h2>
+      <p class="small">After the session, both of you confirm it. Teachers earn 30 XP and learners 20 XP in that skill, and feedback earns 5 XP. XP has a daily limit, and the same two people can earn together only a few times a week.</p>
+    </section>
+
+    <h2 class="section-title">Active</h2>
+    <div class="grid" id="activeSessions"><p class="muted">Loading...</p></div>
+
+    <h2 class="section-title">History</h2>
+    <div class="grid" id="pastSessions"></div>
+  </main>
+
+  <dialog id="reviewDialog" class="dialog">
+    <form id="reviewForm">
+      <h3>How was the session?</h3>
+      <label>Rating
+        <select class="input" id="reviewRating">
+          <option value="5">5 - Excellent</option>
+          <option value="4">4 - Good</option>
+          <option value="3">3 - Okay</option>
+          <option value="2">2 - Poor</option>
+          <option value="1">1 - Bad</option>
+        </select>
+      </label>
+      <label>Comment <span class="muted small">(optional)</span>
+        <textarea class="input" id="reviewComment" rows="3" maxlength="300"></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+        <button class="btn btn-primary" type="submit">Send feedback</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="reportDialog" class="dialog">
+    <form id="reportForm">
+      <h3>Report a problem</h3>
+      <p class="muted small">The session will be marked as disputed and no XP will be given.</p>
+      <label>What went wrong?
+        <textarea class="input" id="reportReason" rows="3" maxlength="300" required minlength="5"></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+        <button class="btn btn-primary" type="submit">Send report</button>
+      </div>
+    </form>
+  </dialog>
+  <script type="module" src="js/sessions.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat · SkillShare 2.0</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <header id="siteNav" class="site-nav"></header>
+  <main class="container page">
+    <div class="chat-layout card" id="chatLayout">
+      <aside class="conv-list" id="convList"><p class="muted">Loading...</p></aside>
+      <section class="thread">
+        <div class="thread-head">
+          <button class="btn btn-ghost btn-sm back-btn" id="backBtn" type="button">Back</button>
+          <strong id="threadTitle">Select a conversation</strong>
+        </div>
+        <div class="messages" id="messages"></div>
+        <form class="msg-form" id="msgForm" hidden>
+          <input class="input" id="msgInput" type="text" maxlength="1000" placeholder="Write a message..." autocomplete="off" aria-label="Message">
+          <button class="btn btn-primary" type="submit">Send</button>
+        </form>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="js/chat.js"></script>
+</body>
+</html>
