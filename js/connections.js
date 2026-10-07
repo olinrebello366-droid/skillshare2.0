@@ -1,5 +1,5 @@
 // Connections: incoming requests, sent requests and accepted connections (live updates).
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import {
   collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
@@ -57,6 +57,10 @@ document.querySelector("main").addEventListener("click", async (e) => {
   btn.disabled = true;
   try {
     if (btn.dataset.act === "accept") {
+      console.log("ACCEPT DEBUG:", {
+  connectionId: btn.dataset.id,
+  currentUser: auth.currentUser?.uid
+});
     await updateDoc(doc(db, "connections", btn.dataset.id), {
   status: "accepted",
   updatedAt: serverTimestamp()

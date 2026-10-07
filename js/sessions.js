@@ -1,5 +1,5 @@
-
 // SkillShare 2.0 — Sessions
+
 import { db } from "./firebase-config.js";
 
 import {
@@ -27,7 +27,8 @@ import {
 
 import {
   confirmSession,
-  disputeSession
+  disputeSession,
+  awardSessionXp
 } from "./rewards.js";
 
 const { user, profile } = await requireUser();
@@ -47,10 +48,21 @@ const form = $("sessionForm");
 let accepted = [];
 const partnerCache = {};
 
-const preselect = new URLSearchParams(location.search).get("with");
+// Prevent repeatedly trying to claim the same session
+// during Firestore realtime updates.
+const xpClaimedThisPage = new Set();
+
+const preselect =
+  new URLSearchParams(location.search).get("with");
+
+
+
+// ---------- HELPERS ----------
 
 const otherId = (connection) =>
-  connection.participants.find((id) => id !== user.uid);
+  connection.participants.find(
+    (id) => id !== user.uid
+  );
 
 const otherName = (connection) =>
   connection.names?.[otherId(connection)] ||
@@ -59,59 +71,98 @@ const otherName = (connection) =>
 
 function todayStr() {
   return new Date(
-    Date.now() - new Date().getTimezoneOffset() * 60000
-  ).toISOString().slice(0, 10);
+    Date.now() -
+      new Date().getTimezoneOffset() * 60000
+  )
+    .toISOString()
+    .slice(0, 10);
 }
 
 dateIn.min = todayStr();
 
 function showConnectionError(error) {
-  console.error("Connection loading failed:", error);
+  console.error(
+    "Connection loading failed:",
+    error
+  );
 
   withSel.innerHTML =
     '<option value="">Could not load connections</option>';
 
   $("noConnections").hidden = false;
+
   $("noConnections").textContent =
     "Could not load your connections. Please refresh the page.";
 
   createBtn.disabled = true;
-  showError(error, "Could not load connections.");
+
+  showError(
+    error,
+    "Could not load connections."
+  );
 }
+
+
 
 // ---------- LOAD ACCEPTED CONNECTIONS ----------
 
 onSnapshot(
   query(
     collection(db, "connections"),
-    where("participants", "array-contains", user.uid)
+    where(
+      "participants",
+      "array-contains",
+      user.uid
+    )
   ),
 
   async (snap) => {
+
     accepted = snap.docs
-      .map((d) => ({ id: d.id, ...d.data() }))
-      .filter((c) =>
-        c.status === "accepted" &&
-        Array.isArray(c.participants) &&
-        c.participants.includes(user.uid)
+      .map((d) => ({
+        id: d.id,
+        ...d.data()
+      }))
+      .filter(
+        (c) =>
+          c.status === "accepted" &&
+          Array.isArray(c.participants) &&
+          c.participants.includes(user.uid)
       );
 
-    // Load partner names from their user profiles.
+
+    // Load partner names from profiles
     await Promise.all(
       accepted.map(async (connection) => {
+
         const uid = otherId(connection);
 
-        if (!uid || partnerCache[uid]) return;
+        if (!uid || partnerCache[uid]) {
+          return;
+        }
 
         try {
-          const userSnap = await getDoc(doc(db, "users", uid));
 
-          partnerCache[uid] = userSnap.exists()
-            ? userSnap.data()
-            : { name: "Your connection", teach: [] };
+          const userSnap =
+            await getDoc(
+              doc(db, "users", uid)
+            );
+
+          partnerCache[uid] =
+            userSnap.exists()
+              ? userSnap.data()
+              : {
+                  name: "Your connection",
+                  teach: []
+                };
 
         } catch (error) {
-          console.error("Partner profile error:", error);
+
+          console.error(
+            "Partner profile error:",
+            error
+          );
+
           partnerCache[uid] = {
             name: "Your connection",
             teach: []
@@ -120,34 +171,62 @@ onSnapshot(
       })
     );
 
+
     const previous = withSel.value;
 
     withSel.innerHTML = accepted.length
-      ? accepted.map((connection) => `
-          <option value="${esc(connection.id)}">
-            ${esc(otherName(connection))}
+      ? accepted
+          .map(
+            (connection) => `
+              <option value="${esc(connection.id)}">
+                ${esc(otherName(connection))}
+              </option>
+            `
+          )
+          .join("")
+      : `
+          <option value="">
+            No accepted connections yet
           </option>
-        `).join("")
-      : '<option value="">No accepted connections yet</option>';
+        `;
+
 
     const wanted = preselect
-      ? accepted.find((c) => c.participants.includes(preselect))
+      ? accepted.find((c) =>
+          c.participants.includes(preselect)
+        )
       : null;
 
-    if (previous && accepted.some((c) => c.id === previous)) {
+
+    if (
+      previous &&
+      accepted.some(
+        (c) => c.id === previous
+      )
+    ) {
+
       withSel.value = previous;
+
     } else if (wanted) {
+
       withSel.value = wanted.id;
+
     } else if (accepted.length) {
+
       withSel.selectedIndex = 0;
     }
 
-    $("noConnections").hidden = accepted.length > 0;
+
+    $("noConnections").hidden =
+      accepted.length > 0;
+
 
     if (!accepted.length) {
+
       $("noConnections").textContent =
         "Accept a connection request before booking a session.";
     }
+
 
     await updateSkills();
   },
@@ -155,45 +234,83 @@ onSnapshot(
   showConnectionError
 );
 
+
+
 // ---------- LOAD SKILLS ----------
 
 async function updateSkills() {
+
   skillSel.innerHTML = "";
   hint.textContent = "";
   createBtn.disabled = true;
+
 
   const connection = accepted.find(
     (c) => c.id === withSel.value
   );
 
+
   if (!connection) {
+
     skillSel.innerHTML =
       '<option value="">Select a connection first</option>';
+
     return;
   }
 
+
   try {
+
     let teachList = [];
 
+
+    // User is teaching
     if (roleSel.value === "teach") {
-      teachList = profile.teach || [];
+
+      teachList =
+        profile.teach || [];
+
+
+    // User is learning
     } else {
-      const partnerUid = otherId(connection);
+
+      const partnerUid =
+        otherId(connection);
+
 
       if (!partnerCache[partnerUid]) {
-        const snap = await getDoc(doc(db, "users", partnerUid));
 
-        partnerCache[partnerUid] = snap.exists()
-          ? snap.data()
-          : { teach: [] };
+        const snap =
+          await getDoc(
+            doc(
+              db,
+              "users",
+              partnerUid
+            )
+          );
+
+
+        partnerCache[partnerUid] =
+          snap.exists()
+            ? snap.data()
+            : { teach: [] };
       }
 
-      teachList = partnerCache[partnerUid].teach || [];
+
+      teachList =
+        partnerCache[partnerUid].teach ||
+        [];
     }
 
-    if (!Array.isArray(teachList) || teachList.length === 0) {
+
+    if (
+      !Array.isArray(teachList) ||
+      teachList.length === 0
+    ) {
+
       skillSel.innerHTML =
         '<option value="">No skills available</option>';
+
 
       hint.textContent =
         roleSel.value === "teach"
@@ -203,213 +320,512 @@ async function updateSkills() {
       return;
     }
 
-    skillSel.innerHTML = teachList.map((skill) => `
-      <option
-        value="${esc(skill.skillId)}"
-        data-name="${esc(skill.name)}"
-      >
-        ${esc(skill.name)}
-      </option>
-    `).join("");
+
+    skillSel.innerHTML =
+      teachList
+        .map(
+          (skill) => `
+            <option
+              value="${esc(skill.skillId)}"
+              data-name="${esc(skill.name)}"
+            >
+              ${esc(skill.name)}
+            </option>
+          `
+        )
+        .join("");
+
 
     createBtn.disabled = false;
 
+
   } catch (error) {
-    console.error("Skill loading failed:", error);
+
+    console.error(
+      "Skill loading failed:",
+      error
+    );
+
 
     skillSel.innerHTML =
       '<option value="">Could not load skills</option>';
 
+
     hint.textContent =
       "Unable to load skills. Please refresh and try again.";
 
-    showError(error, "Could not load skills.");
+
+    showError(
+      error,
+      "Could not load skills."
+    );
   }
 }
 
-withSel.addEventListener("change", updateSkills);
-roleSel.addEventListener("change", updateSkills);
+
+withSel.addEventListener(
+  "change",
+  updateSkills
+);
+
+roleSel.addEventListener(
+  "change",
+  updateSkills
+);
+
+
 
 // ---------- BOOK SESSION ----------
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+form.addEventListener(
+  "submit",
+  async (e) => {
 
-  const connection = accepted.find(
-    (c) => c.id === withSel.value
-  );
+    e.preventDefault();
 
-  if (!connection) {
-    return toast("Choose an accepted connection first.", "error");
+
+    const connection = accepted.find(
+      (c) => c.id === withSel.value
+    );
+
+
+    if (!connection) {
+
+      return toast(
+        "Choose an accepted connection first.",
+        "error"
+      );
+    }
+
+
+    if (!skillSel.value) {
+
+      return toast(
+        "Choose a skill first.",
+        "error"
+      );
+    }
+
+
+    if (!dateIn.value || !timeIn.value) {
+
+      return toast(
+        "Choose a date and time.",
+        "error"
+      );
+    }
+
+
+    const startAt =
+      new Date(
+        `${dateIn.value}T${timeIn.value}`
+      );
+
+
+    if (
+      isNaN(startAt.getTime()) ||
+      startAt <= new Date()
+    ) {
+
+      return toast(
+        "Choose a future date and time.",
+        "error"
+      );
+    }
+
+
+    const partnerUid =
+      otherId(connection);
+
+    const iTeach =
+      roleSel.value === "teach";
+
+
+    const teacherId =
+      iTeach
+        ? user.uid
+        : partnerUid;
+
+
+    const learnerId =
+      iTeach
+        ? partnerUid
+        : user.uid;
+
+
+    const option =
+      skillSel.selectedOptions[0];
+
+
+    if (!option) {
+
+      return toast(
+        "Please select a skill.",
+        "error"
+      );
+    }
+
+
+    setBusy(
+      createBtn,
+      true,
+      "Scheduling..."
+    );
+
+
+    try {
+
+      await addDoc(
+        collection(db, "sessions"),
+        {
+
+          teacherId,
+          learnerId,
+
+          teacherName:
+            iTeach
+              ? profile.name
+              : otherName(connection),
+
+          learnerName:
+            iTeach
+              ? otherName(connection)
+              : profile.name,
+
+          participants: [
+            teacherId,
+            learnerId
+          ],
+
+          pairKey:
+            connection.id,
+
+          skillId:
+            skillSel.value,
+
+          skillName:
+            option.dataset.name,
+
+          date:
+            dateIn.value,
+
+          time:
+            timeIn.value,
+
+          durationMins:
+            Number(durSel.value),
+
+          startAt:
+            Timestamp.fromDate(
+              startAt
+            ),
+
+          status:
+            "scheduled",
+
+          confirmedBy:
+            [],
+
+          rewarded:
+            false,
+
+          createdBy:
+            user.uid,
+
+          createdAt:
+            serverTimestamp()
+        }
+      );
+
+
+      toast(
+        "Session scheduled successfully!",
+        "success"
+      );
+
+
+      form.reset();
+
+      dateIn.min =
+        todayStr();
+
+      withSel.value =
+        connection.id;
+
+      await updateSkills();
+
+
+    } catch (error) {
+
+      console.error(
+        "Session booking failed:",
+        error
+      );
+
+      showError(
+        error,
+        "Could not schedule session."
+      );
+
+
+    } finally {
+
+      setBusy(
+        createBtn,
+        false
+      );
+    }
   }
+);
 
-  if (!skillSel.value) {
-    return toast("Choose a skill first.", "error");
-  }
 
-  if (!dateIn.value || !timeIn.value) {
-    return toast("Choose a date and time.", "error");
-  }
-
-  const startAt = new Date(
-    `${dateIn.value}T${timeIn.value}`
-  );
-
-  if (isNaN(startAt.getTime()) || startAt <= new Date()) {
-    return toast("Choose a future date and time.", "error");
-  }
-
-  const partnerUid = otherId(connection);
-  const iTeach = roleSel.value === "teach";
-
-  const teacherId = iTeach ? user.uid : partnerUid;
-  const learnerId = iTeach ? partnerUid : user.uid;
-
-  const option = skillSel.selectedOptions[0];
-
-  if (!option) {
-    return toast("Please select a skill.", "error");
-  }
-
-  setBusy(createBtn, true, "Scheduling...");
-
-  try {
-    await addDoc(collection(db, "sessions"), {
-      teacherId,
-      learnerId,
-
-      teacherName: iTeach
-        ? profile.name
-        : otherName(connection),
-
-      learnerName: iTeach
-        ? otherName(connection)
-        : profile.name,
-
-      participants: [teacherId, learnerId],
-
-      pairKey: connection.id,
-
-      skillId: skillSel.value,
-      skillName: option.dataset.name,
-
-      date: dateIn.value,
-      time: timeIn.value,
-
-      durationMins: Number(durSel.value),
-
-      startAt: Timestamp.fromDate(startAt),
-
-      status: "scheduled",
-      confirmedBy: [],
-      rewarded: false,
-
-      createdBy: user.uid,
-      createdAt: serverTimestamp()
-    });
-
-    toast("Session scheduled successfully!", "success");
-
-    form.reset();
-    dateIn.min = todayStr();
-
-    withSel.value = connection.id;
-
-    await updateSkills();
-
-  } catch (error) {
-    console.error("Session booking failed:", error);
-    showError(error, "Could not schedule session.");
-
-  } finally {
-    setBusy(createBtn, false);
-  }
-});
 
 // ---------- SESSION STATUS ----------
 
 const STATUS = {
-  scheduled: ["Scheduled", ""],
-  pending_confirmation: ["Pending confirmation", "badge-warn"],
-  completed: ["Completed", "badge-ok"],
-  cancelled: ["Cancelled", "badge-muted"],
-  disputed: ["Disputed", "badge-bad"]
+
+  scheduled: [
+    "Scheduled",
+    ""
+  ],
+
+  pending_confirmation: [
+    "Pending confirmation",
+    "badge-warn"
+  ],
+
+  completed: [
+    "Completed",
+    "badge-ok"
+  ],
+
+  cancelled: [
+    "Cancelled",
+    "badge-muted"
+  ],
+
+  disputed: [
+    "Disputed",
+    "badge-bad"
+  ]
 };
 
-function sessionCard(s) {
-  const iTeach = s.teacherId === user.uid;
 
-  const partner = iTeach
-    ? s.learnerName
-    : s.teacherName;
 
-  const [label, cls] =
-    STATUS[s.status] || [s.status, ""];
+// ---------- AUTOMATIC XP CLAIM ----------
 
-  const mine = (s.confirmedBy || []).includes(user.uid);
+async function claimCompletedSessionXp(session) {
 
-  const theirs = (s.confirmedBy || []).some(
-    (uid) => uid !== user.uid
+  if (
+    session.status !== "completed"
+  ) {
+    return;
+  }
+
+
+  if (
+    !Array.isArray(
+      session.participants
+    ) ||
+    !session.participants.includes(
+      user.uid
+    )
+  ) {
+    return;
+  }
+
+
+  if (
+    xpClaimedThisPage.has(
+      session.id
+    )
+  ) {
+    return;
+  }
+
+
+  xpClaimedThisPage.add(
+    session.id
   );
 
-  const active = [
-    "scheduled",
-    "pending_confirmation"
-  ].includes(s.status);
+
+  try {
+
+    const result =
+      await awardSessionXp(
+        session.id,
+        user.uid
+      );
+
+
+    if (
+      result.awarded
+    ) {
+
+      toast(
+        `You earned +${result.xp} XP!`,
+        "success"
+      );
+    }
+
+ } catch (error) {
+
+  console.error(
+    `Could not claim XP for session ${session.id}:`,
+    error
+  );
+
+  xpClaimedThisPage.delete(
+    session.id
+  );
+
+  toast(
+    `XP could not be awarded: ${error.message}`,
+    "error"
+  );
+}
+}
+
+
+
+// ---------- SESSION CARD ----------
+
+function sessionCard(s) {
+
+  const iTeach =
+    s.teacherId === user.uid;
+
+
+  const partner =
+    iTeach
+      ? s.learnerName
+      : s.teacherName;
+
+
+  const [
+    label,
+    cls
+  ] =
+    STATUS[s.status] ||
+    [
+      s.status,
+      ""
+    ];
+
+
+  const mine =
+    (s.confirmedBy || [])
+      .includes(user.uid);
+
+
+  const theirs =
+    (s.confirmedBy || [])
+      .some(
+        (uid) =>
+          uid !== user.uid
+      );
+
+
+  const active =
+    [
+      "scheduled",
+      "pending_confirmation"
+    ].includes(s.status);
+
 
   let actions = "";
   let info = "";
 
+
+
+  // ---------- ACTIVE SESSION ----------
+
   if (active) {
+
     if (!mine) {
+
       actions += `
-        <button class="btn btn-primary btn-sm"
-          data-act="confirm" data-id="${esc(s.id)}">
+        <button
+          class="btn btn-primary btn-sm"
+          data-act="confirm"
+          data-id="${esc(s.id)}"
+        >
           Confirm completed
         </button>
       `;
+
     } else {
+
       info = `
         <p class="small muted">
-          You confirmed. Waiting for ${esc(partner)}.
+          You confirmed. Waiting for
+          ${esc(partner)}.
         </p>
       `;
     }
+
 
     if (theirs && !mine) {
+
       info = `
         <p class="small muted">
-          ${esc(partner)} has already confirmed.
+          ${esc(partner)}
+          has already confirmed.
         </p>
       `;
     }
 
+
     actions += `
-      <button class="btn btn-ghost btn-sm"
-        data-act="report" data-id="${esc(s.id)}">
+      <button
+        class="btn btn-ghost btn-sm"
+        data-act="report"
+        data-id="${esc(s.id)}"
+      >
         Report a problem
       </button>
 
-      <button class="btn btn-ghost btn-sm"
-        data-act="cancel" data-id="${esc(s.id)}">
+      <button
+        class="btn btn-ghost btn-sm"
+        data-act="cancel"
+        data-id="${esc(s.id)}"
+      >
         Cancel
       </button>
     `;
   }
 
+
+
+  // ---------- COMPLETED SESSION ----------
+
   if (s.status === "completed") {
-    const xp = s.xpAwarded?.[user.uid] || 0;
+
+    const xp =
+      user.uid === s.teacherId
+        ? 30
+        : user.uid === s.learnerId
+          ? 20
+          : 0;
+
 
     info = `
       <p class="small muted">
-        ${xp
-          ? `You earned +${xp} XP in ${esc(s.skillName)}.`
-          : "No XP was awarded for this session."}
+        ${
+          xp
+            ? `Session completed. XP earned: +${xp}`
+            : "Session completed."
+        }
       </p>
     `;
   }
 
+
+
+  // ---------- DISPUTED SESSION ----------
+
   if (s.status === "disputed") {
+
     info = `
       <p class="small muted">
         This session was reported and gives no XP.
@@ -417,128 +833,383 @@ function sessionCard(s) {
     `;
   }
 
+
+
   return `
     <article class="card session-card">
+
       <div class="session-top">
+
         <div>
-          <h3>${esc(s.skillName || "Session")}</h3>
+
+          <h3>
+            ${esc(
+              s.skillName ||
+              "Session"
+            )}
+          </h3>
+
           <p class="muted small">
-            ${iTeach ? "You teach" : "You learn from"}
-            ${esc(partner || "your connection")}
+
+            ${
+              iTeach
+                ? "You teach"
+                : "You learn from"
+            }
+
+            ${esc(
+              partner ||
+              "your connection"
+            )}
+
           </p>
+
         </div>
 
-        <span class="badge ${cls}">${label}</span>
+
+        <span class="badge ${cls}">
+          ${label}
+        </span>
+
       </div>
 
+
       <p class="small">
-        ${esc(fmtDateTime(tsToDate(s.startAt)))}
-        · ${Number(s.durationMins) || 0} min
+
+        ${esc(
+          fmtDateTime(
+            tsToDate(
+              s.startAt
+            )
+          )
+        )}
+
+        ·
+
+        ${Number(
+          s.durationMins
+        ) || 0}
+
+        min
+
       </p>
+
 
       ${info}
 
-      <div class="card-actions">${actions}</div>
+
+      <div class="card-actions">
+
+        ${actions}
+
+      </div>
+
     </article>
   `;
 }
 
+
+
 // ---------- LIVE SESSION LIST ----------
 
 onSnapshot(
+
   query(
-    collection(db, "sessions"),
-    where("participants", "array-contains", user.uid)
+    collection(
+      db,
+      "sessions"
+    ),
+
+    where(
+      "participants",
+      "array-contains",
+      user.uid
+    )
   ),
 
-  (snap) => {
-    const all = snap.docs.map((d) => ({
-      id: d.id,
-      ...d.data()
-    }));
 
-    const startMs = (s) =>
-      tsToDate(s.startAt)?.getTime() || 0;
+  async (snap) => {
 
-    const active = all
-      .filter((s) =>
-        ["scheduled", "pending_confirmation"].includes(s.status)
-      )
-      .sort((a, b) => startMs(a) - startMs(b));
+    const all =
+      snap.docs.map(
+        (d) => ({
+          id: d.id,
+          ...d.data()
+        })
+      );
 
-    const past = all
-      .filter((s) =>
-        !["scheduled", "pending_confirmation"].includes(s.status)
-      )
-      .sort((a, b) => startMs(b) - startMs(a));
 
-    $("activeSessions").innerHTML = active.length
-      ? active.map(sessionCard).join("")
-      : '<p class="empty">No active sessions.</p>';
+    // Automatically claim XP for every
+    // completed session belonging to this user.
+    //
+    // The Firestore rules make sure:
+    // - the session is actually completed
+    // - the user is a participant
+    // - teacher gets +30
+    // - learner gets +20
+    // - duplicate XP cannot be created
 
-    $("pastSessions").innerHTML = past.length
-      ? past.map(sessionCard).join("")
-      : '<p class="empty">Completed and cancelled sessions will appear here.</p>';
-  },
+    const completedSessions =
+      all.filter(
+        (s) =>
+          s.status === "completed"
+      );
 
-  (error) => {
-    console.error("Session list failed:", error);
+
+    for (
+      const session
+      of completedSessions
+    ) {
+
+      await claimCompletedSessionXp(
+        session
+      );
+    }
+
+
+    const startMs =
+      (s) =>
+        tsToDate(
+          s.startAt
+        )?.getTime() || 0;
+
+
+    const active =
+      all
+        .filter(
+          (s) =>
+            [
+              "scheduled",
+              "pending_confirmation"
+            ].includes(
+              s.status
+            )
+        )
+        .sort(
+          (a, b) =>
+            startMs(a) -
+            startMs(b)
+        );
+
+
+    const past =
+      all
+        .filter(
+          (s) =>
+            ![
+              "scheduled",
+              "pending_confirmation"
+            ].includes(
+              s.status
+            )
+        )
+        .sort(
+          (a, b) =>
+            startMs(b) -
+            startMs(a)
+        );
+
 
     $("activeSessions").innerHTML =
-      '<p class="empty">Could not load sessions. Refresh the page.</p>';
+      active.length
+        ? active
+            .map(sessionCard)
+            .join("")
+        : `
+            <p class="empty">
+              No active sessions.
+            </p>
+          `;
 
-    $("pastSessions").innerHTML = "";
 
-    showError(error, "Could not load sessions.");
+    $("pastSessions").innerHTML =
+      past.length
+        ? past
+            .map(sessionCard)
+            .join("")
+        : `
+            <p class="empty">
+              Completed and cancelled
+              sessions will appear here.
+            </p>
+          `;
+  },
+
+
+  (error) => {
+
+    console.error(
+      "Session list failed:",
+      error
+    );
+
+
+    $("activeSessions").innerHTML =
+      `
+        <p class="empty">
+          Could not load sessions.
+          Refresh the page.
+        </p>
+      `;
+
+
+    $("pastSessions").innerHTML =
+      "";
+
+
+    showError(
+      error,
+      "Could not load sessions."
+    );
   }
 );
 
+
+
 // ---------- SESSION ACTIONS ----------
 
-document.querySelector("main").addEventListener("click", async (e) => {
-  const btn = e.target.closest("[data-act]");
+document
+  .querySelector("main")
+  .addEventListener(
+    "click",
+    async (e) => {
 
-  if (!btn || !btn.dataset.id) return;
+      const btn =
+        e.target.closest(
+          "[data-act]"
+        );
 
-  const id = btn.dataset.id;
 
-  if (btn.dataset.act === "confirm") {
-    setBusy(btn, true, "Confirming...");
+      if (
+        !btn ||
+        !btn.dataset.id
+      ) {
+        return;
+      }
 
-    try {
-      const result = await confirmSession(id, user.uid);
 
-      toast(
-        result.message,
-        result.status === "completed" ? "success" : "info"
-      );
+      const id =
+        btn.dataset.id;
 
-    } catch (error) {
-      showError(error);
-      setBusy(btn, false);
+
+
+      // ---------- CONFIRM SESSION ----------
+
+      if (
+        btn.dataset.act ===
+        "confirm"
+      ) {
+
+        setBusy(
+          btn,
+          true,
+          "Confirming..."
+        );
+
+
+        try {
+
+          const result =
+            await confirmSession(
+              id,
+              user.uid
+            );
+
+
+          toast(
+            result.message,
+            result.status ===
+              "completed"
+              ? "success"
+              : "info"
+          );
+
+
+          // If this confirmation completed
+          // the session, immediately claim XP.
+          if (
+            result.status ===
+            "completed"
+          ) {
+
+            await claimCompletedSessionXp({
+              id
+            });
+          }
+
+
+        } catch (error) {
+
+          showError(error);
+
+          setBusy(
+            btn,
+            false
+          );
+        }
+      }
+
+
+
+      // ---------- CANCEL SESSION ----------
+
+      if (
+        btn.dataset.act ===
+        "cancel"
+      ) {
+
+        if (
+          !confirm(
+            "Cancel this session?"
+          )
+        ) {
+          return;
+        }
+
+
+        try {
+
+          await updateDoc(
+            doc(
+              db,
+              "sessions",
+              id
+            ),
+            {
+              status:
+                "cancelled",
+
+              updatedAt:
+                serverTimestamp()
+            }
+          );
+
+
+          toast(
+            "Session cancelled.",
+            "success"
+          );
+
+
+        } catch (error) {
+
+          showError(error);
+        }
+      }
+
+
+
+      // ---------- REPORT SESSION ----------
+
+      if (
+        btn.dataset.act ===
+        "report"
+      ) {
+
+        toast(
+          "Problem reporting requires the server function, which is not enabled in this free-plan setup.",
+          "info"
+        );
+      }
     }
-  }
-
-  if (btn.dataset.act === "cancel") {
-    if (!confirm("Cancel this session?")) return;
-
-    try {
-      await updateDoc(doc(db, "sessions", id), {
-        status: "cancelled",
-        updatedAt: serverTimestamp()
-      });
-
-      toast("Session cancelled.", "success");
-
-    } catch (error) {
-      showError(error);
-    }
-  }
-
-  if (btn.dataset.act === "report") {
-    toast(
-      "Problem reporting requires the server function, which is not enabled in this free-plan setup.",
-      "info"
-    );
-  }
-});
+  );

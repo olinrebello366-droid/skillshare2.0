@@ -5,4 +5,4 @@ functions/node_modules/
 !.env.example
 .firebase/
 firebase-debug.log
-.DS_Store
+.DS_Storegit init
